@@ -82,15 +82,26 @@
 
         const data = JSON.parse(inputElement.value);
         function calc(data) {
-            const objResult = {};
+            const objResult = {
+                SUM: {}
+            };
 
             Object.keys(data).forEach((item) => {
                 const obj = {};
                 data[item].forEach((c) => {
-                    obj[`[${c.tp}-${c.sl}]`] =
-                        `${c.bu * (c.tp - 0.1) - c.tach * (c.sl + 0.1)}%`;
+                    const value = c.bu * (c.tp - 0.1) - c.tach * (c.sl + 0.1)
+                    const key = `[${c.tp}-${c.sl}]`
+
+                    obj[key] = value;
+
+                    if (objResult.SUM.hasOwnProperty(key)) {
+                        objResult.SUM[key] += value
+                    } else {
+                        objResult.SUM[key] = value
+                    }
                 });
                 objResult[item] = obj;
+
             });
             displayJson(objResult, "viewer")
         }
