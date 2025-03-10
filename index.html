@@ -5,10 +5,97 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="shortcut icon" href="./favicon.ico" />
+    <style>
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: "Courier New", monospace;
+        }
+
+        .string {
+            color: #98c379;
+        }
+
+        .number {
+            color: #d19a66;
+        }
+
+        .boolean {
+            color: #56b6c2;
+        }
+
+        .null {
+            color: #e06c75;
+        }
+
+        .key {
+            color: #e5c07b;
+        }
+    </style>
 </head>
 
 <body>
     <h1>Hello</h1>
+    <input id="input-data" type="text">
+    <button onclick="handleChange()">click</button>
+    <div id="viewer"></div>
 </body>
+<script>
+
+    function formatJson(json) {
+        if (typeof json !== "string") {
+            json = JSON.stringify(json, null, 4);
+        }
+        json = json.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+        return json.replace(
+            /("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|\b-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?\b)/g,
+            function (match) {
+                let cls = "number";
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = "key";
+                    } else {
+                        cls = "string";
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = "boolean";
+                } else if (/null/.test(match)) {
+                    cls = "null";
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            }
+        );
+    }
+
+    function displayJson(json, elementId) {
+        document.getElementById(elementId).innerHTML = "<pre>" + formatJson(json) + "</pre>";
+    }
+
+
+    const handleChange = (event) => {
+        const inputElement = document.getElementById('input-data')
+
+        const data = JSON.parse(inputElement.value);
+        function calc(data) {
+            const objResult = {};
+
+            Object.keys(data).forEach((item) => {
+                const obj = {};
+                data[item].forEach((c) => {
+                    obj[`[${c.tp}-${c.sl}]`] =
+                        `${c.bu * (c.tp - 0.1) - c.tach * (c.sl + 0.1)}%`;
+                });
+                objResult[item] = obj;
+            });
+            displayJson(objResult, "viewer")
+        }
+        calc(data);
+    }
+</script>
 
 </html>
