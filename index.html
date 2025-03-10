@@ -39,7 +39,7 @@
 </head>
 
 <body>
-    <h1>Hello</h1>
+    <h1>Hello 999</h1>
     <input id="input-data" type="text">
     <button onclick="handleChange()">click</button>
     <div id="viewer"></div>
@@ -82,9 +82,9 @@
 
         const data = JSON.parse(inputElement.value);
         function calc(data) {
-            const objResult = {
-                SUM: {}
-            };
+
+            const SUM = {}
+            const objResult = {};
 
             Object.keys(data).forEach((item) => {
                 const obj = {};
@@ -94,15 +94,16 @@
 
                     obj[key] = value;
 
-                    if (objResult.SUM.hasOwnProperty(key)) {
-                        objResult.SUM[key] += value
+                    if (SUM.hasOwnProperty(key)) {
+                        SUM[key] += value
                     } else {
-                        objResult.SUM[key] = value
+                        SUM[key] = value
                     }
                 });
                 objResult[item] = obj;
 
             });
+            objResult.SUM = SUM
             displayJson(objResult, "viewer")
         }
         calc(data);
