@@ -83,25 +83,38 @@
         const data = JSON.parse(inputElement.value);
         function calc(data) {
 
-            const SUM = {}
+            const SUM = {
+                'SELL': {},
+                'BUY': {},
+            }
             const objResult = {};
 
             Object.keys(data).forEach((item) => {
-                const obj = {};
+                const obj = {
+                    'SELL': {},
+                    'BUY': {},
+                };
                 data[item].forEach((c) => {
                     const value = c.bu * (c.tp - 0.1) - c.tach * (c.sl + 0.1)
                     const key = `[${c.tp}-${c.sl}]`
-
-                    obj[key] = value;
-
-                    if (SUM.hasOwnProperty(key)) {
-                        SUM[key] += value
-                    } else {
-                        SUM[key] = value
+                    if (c.type === "SELL") {
+                        obj['SELL'][key] = value;
+                        if (SUM['SELL'].hasOwnProperty(key)) {
+                            SUM['SELL'][key] += value
+                        } else {
+                            SUM['SELL'][key] = value
+                        }
+                    }
+                    if (c.type === "BUY") {
+                        obj['BUY'][key] = value;
+                        if (SUM['BUY'].hasOwnProperty(key)) {
+                            SUM['BUY'][key] += value
+                        } else {
+                            SUM['BUY'][key] = value
+                        }
                     }
                 });
                 objResult[item] = obj;
-
             });
             objResult.SUM = SUM
             displayJson(objResult, "viewer")
