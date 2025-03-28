@@ -1,126 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <link rel="shortcut icon" href="./favicon.ico" />
     <style>
-        pre {
-            background: #282c34;
-            color: #abb2bf;
-            padding: 10px;
-            border-radius: 5px;
-            overflow-x: auto;
-            font-family: "Courier New", monospace;
-        }
+      pre {
+        background: #282c34;
+        color: #abb2bf;
+        padding: 10px;
+        border-radius: 5px;
+        overflow-x: auto;
+        font-family: "Courier New", monospace;
+      }
 
-        .string {
-            color: #98c379;
-        }
+      .string {
+        color: #98c379;
+      }
 
-        .number {
-            color: #d19a66;
-        }
+      .number {
+        color: #d19a66;
+      }
 
-        .boolean {
-            color: #56b6c2;
-        }
+      .boolean {
+        color: #56b6c2;
+      }
 
-        .null {
-            color: #e06c75;
-        }
+      .null {
+        color: #e06c75;
+      }
 
-        .key {
-            color: #e5c07b;
-        }
+      .key {
+        color: #e5c07b;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <h1>Hello 999</h1>
-    <input id="input-data" type="text">
+    <input id="input-data" type="text" />
     <button onclick="handleChange()">click</button>
     <div id="viewer"></div>
-</body>
-<script>
-
+  </body>
+  <script>
     function formatJson(json) {
-        if (typeof json !== "string") {
-            json = JSON.stringify(json, null, 4);
-        }
-        json = json.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      if (typeof json !== "string") {
+        json = JSON.stringify(json, null, 4);
+      }
+      json = json
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
 
-        return json.replace(
-            /("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|\b-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?\b)/g,
-            function (match) {
-                let cls = "number";
-                if (/^"/.test(match)) {
-                    if (/:$/.test(match)) {
-                        cls = "key";
-                    } else {
-                        cls = "string";
-                    }
-                } else if (/true|false/.test(match)) {
-                    cls = "boolean";
-                } else if (/null/.test(match)) {
-                    cls = "null";
-                }
-                return '<span class="' + cls + '">' + match + '</span>';
+      return json.replace(
+        /("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|\b-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?\b)/g,
+        function (match) {
+          let cls = "number";
+          if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+              cls = "key";
+            } else {
+              cls = "string";
             }
-        );
+          } else if (/true|false/.test(match)) {
+            cls = "boolean";
+          } else if (/null/.test(match)) {
+            cls = "null";
+          }
+          return '<span class="' + cls + '">' + match + "</span>";
+        }
+      );
     }
 
     function displayJson(json, elementId) {
-        document.getElementById(elementId).innerHTML = "<pre>" + formatJson(json) + "</pre>";
+      document.getElementById(elementId).innerHTML =
+        "<pre>" + formatJson(json) + "</pre>";
     }
-
 
     const handleChange = (event) => {
-        const inputElement = document.getElementById('input-data')
+      const inputElement = document.getElementById("input-data");
 
-        const data = JSON.parse(inputElement.value);
-        function calc(data) {
+      const data = JSON.parse(inputElement.value);
+      function calc(data) {
+        const SUM = {
+          SELL: 0,
+          BUY: 0,
+        };
+        const objResult = {};
 
-            const SUM = {
-                'SELL': {},
-                'BUY': {},
+        Object.keys(data).forEach((item) => {
+          const obj = {
+            SELL: {},
+            BUY: {},
+          };
+          data[item].forEach((c) => {
+            const value = c.bu * (c.tp - 0.1) - c.tach * (c.sl + 0.1);
+            const key = `[${c.tp}-${c.sl}]`;
+            if (c.type === "SELL") {
+              obj["SELL"][key] = value;
             }
-            const objResult = {};
-
-            Object.keys(data).forEach((item) => {
-                const obj = {
-                    'SELL': {},
-                    'BUY': {},
-                };
-                data[item].forEach((c) => {
-                    const value = c.bu * (c.tp - 0.1) - c.tach * (c.sl + 0.1)
-                    const key = `[${c.tp}-${c.sl}]`
-                    if (c.type === "SELL") {
-                        obj['SELL'][key] = value;
-                        if (SUM['SELL'].hasOwnProperty(key)) {
-                            SUM['SELL'][key] += value
-                        } else {
-                            SUM['SELL'][key] = value
-                        }
-                    }
-                    if (c.type === "BUY") {
-                        obj['BUY'][key] = value;
-                        if (SUM['BUY'].hasOwnProperty(key)) {
-                            SUM['BUY'][key] += value
-                        } else {
-                            SUM['BUY'][key] = value
-                        }
-                    }
-                });
-                objResult[item] = obj;
-            });
-            objResult.SUM = SUM
-            displayJson(objResult, "viewer")
-        }
-        calc(data);
-    }
-</script>
-
+            if (c.type === "BUY") {
+              obj["BUY"][key] = value;
+            }
+          });
+          SUM.SELL += Math.max(...Object.values(obj.SELL));
+          SUM.BUY += Math.max(...Object.values(obj.BUY));
+          objResult[item] = obj;
+        });
+        objResult.SUM = SUM;
+        displayJson(objResult, "viewer");
+      }
+      calc(data);
+    };
+  </script>
 </html>
